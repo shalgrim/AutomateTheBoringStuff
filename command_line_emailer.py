@@ -11,6 +11,8 @@ import logging
 import sys
 from getpass import getpass
 from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 from selenium.common import exceptions as selenium_exceptions
 
 logger = logging.getLogger('automate_boring.command_line_emailer')
@@ -35,17 +37,8 @@ if __name__ == '__main__':
     pwd_elem.send_keys(pwd)
     pwd_elem.submit()
 
-    # buttons = browser.find_elements_by_css_selector('div[role="button"]')
-    # for button in buttons:
-    #     if button.text == 'COMPOSE':
-    #         compose_button = button
-    #         break
-    # else:
-    #     sys.stderr.write('Could not find compose button')
-    #     sys.exit(-1)
-
-    compose_button = browser.find_element_by_id(':3l')
-    compose_button.click()
+    html_elem = browser.find_element_by_tag_name('html')
+    html_elem.send_keys('c')
 
     to_box = browser.find_element_by_css_selector('textarea[name="to"]')
     to_box.send_keys(addy)
@@ -53,8 +46,19 @@ if __name__ == '__main__':
     subject_box = browser.find_element_by_css_selector('input[name="subjectbox"]')
     subject_box.send_keys(msg)
 
-    send_button = browser.find_element_by_id(':9f')
-    send_button.click()
+    # send email
+    buttons = browser.find_elements_by_css_selector('div[role="button"]')
+    for button in buttons:
+        if button.text == 'Send':
+            logger.info('send button id: {}'.format(button.get_attribute('id')))
+            button.click()
+            break
+    else:
+        sys.stderr.write('Could not find send button')
+        sys.exit(-1)
+
+    profile_button = browser.find_element_by_css_selector('.gb_8a')
+    profile_button.click()
 
     signout_button = browser.find_element_by_id('gb_71')
     signout_button.click()
