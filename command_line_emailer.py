@@ -11,11 +11,15 @@ import logging
 import sys
 from getpass import getpass
 from selenium import webdriver
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.keys import Keys
 from selenium.common import exceptions as selenium_exceptions
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.ui import WebDriverWait
 
 logger = logging.getLogger('automate_boring.command_line_emailer')
+DELAY_SEC = 10
 
 if __name__ == '__main__':
     addy = sys.argv[1]
@@ -32,6 +36,14 @@ if __name__ == '__main__':
         uname_elem.submit()
     except selenium_exceptions.NoSuchElementException:
         logger.info('Assuming already on password page')
+
+    try:
+        element_present = expected_conditions.presence_of_element_located((By.ID, 'Passwd'))
+        WebDriverWait(browser, DELAY_SEC).until(element_present)
+    except selenium_exceptions.TimeoutException:
+        msg = 'Failed to load password field in {} seconds'.format(DELAY_SEC)
+        logger.error(msg)
+        raise
 
     pwd_elem = browser.find_element_by_id('Passwd')
     pwd_elem.send_keys(pwd)
