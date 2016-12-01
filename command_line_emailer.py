@@ -9,6 +9,7 @@ messages from a Facebook or Twitter account.
 
 import logging
 import sys
+import time
 from getpass import getpass
 from selenium import webdriver
 from selenium.common import exceptions as selenium_exceptions
@@ -49,8 +50,25 @@ if __name__ == '__main__':
     pwd_elem.send_keys(pwd)
     pwd_elem.submit()
 
-    html_elem = browser.find_element_by_tag_name('html')
-    html_elem.send_keys('c')
+    try:
+        element_present = expected_conditions.presence_of_element_located((By.CSS_SELECTOR, '.z0'))
+        WebDriverWait(browser, DELAY_SEC).until(element_present)
+    except selenium_exceptions.TimeoutException:
+        msg = 'Failed to load Compose button in {} seconds'.format(DELAY_SEC)
+        logger.error(msg)
+        raise
+
+    compose_button = browser.find_element_by_css_selector('.z0')
+    compose_button.click()
+
+    # TODO: refactor, lots of modularization can happen here
+    try:
+        element_present = expected_conditions.presence_of_element_located((By.CSS_SELECTOR, 'textarea[name="to"]'))
+        WebDriverWait(browser, DELAY_SEC).until(element_present)
+    except selenium_exceptions.TimeoutException:
+        msg = 'Failed to load To box in {} seconds'.format(DELAY_SEC)
+        logger.error(msg)
+        raise
 
     to_box = browser.find_element_by_css_selector('textarea[name="to"]')
     to_box.send_keys(addy)
@@ -69,10 +87,13 @@ if __name__ == '__main__':
         sys.stderr.write('Could not find send button')
         sys.exit(-1)
 
+    # wait two seconds because otherwise I get a browser popup saying the page is telling me unsaved data might be lost
+    time.sleep(2)
     profile_button = browser.find_element_by_css_selector('.gb_8a')
     profile_button.click()
 
     signout_button = browser.find_element_by_id('gb_71')
     signout_button.click()
 
-
+    time.sleep(2) # wait for it to log out
+    browser.quit()
