@@ -5,6 +5,7 @@ downloads all the resulting images. You could write a program that works with an
 """
 
 import logging
+import os
 import requests
 import sys
 from selenium import webdriver
@@ -14,9 +15,11 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
 
 DELAY_SEC = 10
+IMAGE_DIR = r'.\out\downloaded_images'
 logger = logging.getLogger('automate_boring.image_site_downloader')
 
 if __name__ == '__main__':
+    os.makedirs(IMAGE_DIR, exist_ok=True)
     url = sys.argv[1]
     search_term = ' '.join(sys.argv[2:])
 
@@ -28,19 +31,23 @@ if __name__ == '__main__':
     search_elem.submit()
 
     try:
-        pic_elems = browser.find_element_by_css_selector('img.photo')
-        element_present = expected_conditions.presence_of_element_located((By.CSS_SELECTOR, '.z0'))
-        WebDriverWait(browser, DELAY_SEC).until(element_present)
+        pic_elems = browser.find_elements_by_css_selector('img.photo')
+        # article.is_photo:nth-child(2) > section:nth-child(1) > div:nth-child(1) > img:nth-child(1)
+        # element_present = expected_conditions.presence_of_element_located((By.CSS_SELECTOR, '.z0'))
+        # WebDriverWait(browser, DELAY_SEC).until(element_present)
     except selenium_exceptions.TimeoutException:
         msg = 'Failed to find any images'
         logger.info(msg)
         raise
 
     for pic in pic_elems:
-        pic_url = 'https://' + pic.get('src')
+        pic_url = pic.get_attribute('src')
         res = requests.get(pic_url)
-        res.raise_for_status
-        # NEXT: save image to file
+        res.raise_for_status()
+
+        with open(os.path.join(IMAGE_DIR, 'CHANGEME.jpg'), 'wb') as f:
+            for chunk in res.iter_content(100000): # TODO: upgrade to python 3.6 for 100_000
+                f.write(chunk)
 
 
 
