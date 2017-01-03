@@ -42,7 +42,13 @@ if __name__ == '__main__':
 
     for pic in pic_elems:
         pic_url = pic.get_attribute('src')
-        res = requests.get(pic_url)
+
+        try:
+            res = requests.get(pic_url)
+        except requests.exceptions.InvalidSchema as e:
+            logger.error(repr(e))
+            continue
+
         res.raise_for_status()
 
         with open(os.path.join(IMAGE_DIR, 'CHANGEME.jpg'), 'wb') as f:
