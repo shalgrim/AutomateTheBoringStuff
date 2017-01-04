@@ -15,6 +15,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
 
+
 DELAY_SEC = 10
 IMAGE_DIR = r'.\out\downloaded_images'
 logger = logging.getLogger('automate_boring.image_site_downloader')
@@ -32,8 +33,6 @@ if __name__ == '__main__':
     search_elem.submit()
 
     try:
-        # pic_elems = browser.find_elements_by_css_selector('img.photo')
-        # article.is_photo:nth-child(2) > section:nth-child(1) > div:nth-child(1) > img:nth-child(1)
         element_present = expected_conditions.presence_of_element_located((By.CSS_SELECTOR, 'img.photo'))
         WebDriverWait(browser, DELAY_SEC).until(element_present)
     except selenium_exceptions.TimeoutException:
@@ -42,7 +41,6 @@ if __name__ == '__main__':
         raise
 
     pic_elems = browser.find_elements_by_css_selector('img.photo')
-
     for pic in pic_elems:
         pic_url = pic.get_attribute('src')
 
@@ -54,11 +52,6 @@ if __name__ == '__main__':
 
         res.raise_for_status()
         fn = os.path.basename(urllib.parse.urlparse(pic_url).path)
-
         with open(os.path.join(IMAGE_DIR, fn), 'wb') as f:
             for chunk in res.iter_content(100000): # TODO: upgrade to python 3.6 for 100_000
                 f.write(chunk)
-
-
-
-
