@@ -8,6 +8,7 @@ import logging
 import os
 import requests
 import sys
+import urllib
 from selenium import webdriver
 from selenium.common import exceptions as selenium_exceptions
 from selenium.webdriver.common.by import By
@@ -31,14 +32,16 @@ if __name__ == '__main__':
     search_elem.submit()
 
     try:
-        pic_elems = browser.find_elements_by_css_selector('img.photo')
+        # pic_elems = browser.find_elements_by_css_selector('img.photo')
         # article.is_photo:nth-child(2) > section:nth-child(1) > div:nth-child(1) > img:nth-child(1)
-        # element_present = expected_conditions.presence_of_element_located((By.CSS_SELECTOR, '.z0'))
-        # WebDriverWait(browser, DELAY_SEC).until(element_present)
+        element_present = expected_conditions.presence_of_element_located((By.CSS_SELECTOR, 'img.photo'))
+        WebDriverWait(browser, DELAY_SEC).until(element_present)
     except selenium_exceptions.TimeoutException:
-        msg = 'Failed to find any images'
-        logger.info(msg)
+        msg = 'Failed to find any images in {} seconds'.format(DELAY_SEC)
+        logger.error(msg)
         raise
+
+    pic_elems = browser.find_elements_by_css_selector('img.photo')
 
     for pic in pic_elems:
         pic_url = pic.get_attribute('src')
@@ -50,8 +53,9 @@ if __name__ == '__main__':
             continue
 
         res.raise_for_status()
+        fn = os.path.basename(urllib.parse.urlparse(pic_url).path)
 
-        with open(os.path.join(IMAGE_DIR, 'CHANGEME.jpg'), 'wb') as f:
+        with open(os.path.join(IMAGE_DIR, fn), 'wb') as f:
             for chunk in res.iter_content(100000): # TODO: upgrade to python 3.6 for 100_000
                 f.write(chunk)
 
