@@ -9,6 +9,7 @@ automatically play the game.
 """
 
 import logging
+from selenium import common
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
@@ -21,12 +22,16 @@ if __name__ == '__main__':
     browser = webdriver.Firefox()
     browser.get(URL)
 
-    game_over = False
-    game_elem = ?
+    game_elem = browser.find_element_by_class_name('game-container')
 
+    try: game_over_elem = browser.find_element_by_class_name('retry-button')
+    except common.exceptions.NoSuchElementException: game_over_elem = None
 
-    while not game_over:
+    while not game_over_elem:
         game_elem.send_keys(KEYSTROKES[0])
         KEYSTROKES = KEYSTROKES[1:] + KEYSTROKES[:1]
+        try: game_over_elem = browser.find_element_by_class_name('retry-button')
+        except common.exceptions.NoSuchElementException: game_over_elem = None
 
-        # game over selector: body > div > div.game-container > div.game-message.game-over
+    print('you scored something')
+
