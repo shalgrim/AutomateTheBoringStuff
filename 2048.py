@@ -24,14 +24,20 @@ if __name__ == '__main__':
 
     game_elem = browser.find_element_by_class_name('game-container')
 
-    try: game_over_elem = browser.find_element_by_class_name('retry-button')
-    except common.exceptions.NoSuchElementException: game_over_elem = None
+    try:
+        game_over_elem = browser.find_element_by_class_name('retry-button')
+        game_over_elem = game_over_elem.is_displayed()
+    except common.exceptions.NoSuchElementException:
+        game_over_elem = None
 
     while not game_over_elem:
         game_elem.send_keys(KEYSTROKES[0])
         KEYSTROKES = KEYSTROKES[1:] + KEYSTROKES[:1]
-        try: game_over_elem = browser.find_element_by_class_name('retry-button')
-        except common.exceptions.NoSuchElementException: game_over_elem = None
+        try:
+            game_over_elem = browser.find_element_by_class_name('retry-button')
+            game_over_elem = game_over_elem.is_displayed()
+        except common.exceptions.NoSuchElementException:
+            game_over_elem = None
 
     print('you scored something')
 
