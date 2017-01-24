@@ -15,23 +15,29 @@ def main(filename, outfile=None):
     # read data into matrix
     wb = openpyxl.load_workbook(filename)
     sheet: openpyxl.worksheet.worksheet.Worksheet = wb.active
-    matrix = [[]*sheet.max_column]*sheet.max_row
+    matrix = [[None]*sheet.max_column]*sheet.max_row
+    inverted = [[None]*sheet.max_row]*sheet.max_column
     for column_idx in range(1, sheet.max_column+1):
         column = get_column_letter(column_idx)
         for row in range(1, sheet.max_row+1):
-            matrix[row][column] = sheet[f'{column}{row}']
+            matrix[row-1][column_idx-1] = sheet[f'{column}{row}'].value
 
     # invert matrix
-    for row_idx in range(2, len(matrix)+1):
-        for col_idx in range(1, row_idx):   # just go up to diagonal
-            matrix[row_idx][col_idx], matrix[col_idx][row_idx] = \
-                matrix[col_idx][row_idx], matrix[row_idx][col_idx]
+    for row_idx in range(len(matrix)):
+        for col_idx in range(len(matrix[row_idx])):
+            inverted[col_idx][row_idx] = matrix[row_idx][col_idx]
 
-    # write data back to cells
+    # clear out cells in sheet
     for column_idx in range(1, sheet.max_column+1):
         column = get_column_letter(column_idx)
-        for row in range(1, sheet.max_row+1):
-            sheet[f'{column}{row}'] = matrix[row][column]
+        for row_idx in range(1, sheet.max_row+1):
+            sheet[f'{column}{row_idx}'] = None
+
+    # write data back to cells
+    for row_idx in range(len(inverted)):
+        for column_idx in range(len(inverted[row_idx])):
+            column = get_column_letter(column_idx+1)
+            sheet[f'{column}{row_idx+1}'] = inverted[row_idx][column_idx]
 
     if not outfile:
         logger.warning('will overwrite existing file')
