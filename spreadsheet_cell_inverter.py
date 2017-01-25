@@ -23,7 +23,8 @@ def main(filename, outfile=None):
     for column_idx in range(1, sheet.max_column+1):
         column = get_column_letter(column_idx)
         for row in range(1, sheet.max_row+1):
-            matrix[row-1][column_idx-1] = sheet[f'{column}{row}'].value
+            cell = sheet[f'{column}{row}']
+            matrix[row-1][column_idx-1] = (cell.value, cell.number_format)
 
     # invert matrix
     for row_idx in range(len(matrix)):
@@ -40,7 +41,8 @@ def main(filename, outfile=None):
     for row_idx in range(len(inverted)):
         for column_idx in range(len(inverted[row_idx])):
             column = get_column_letter(column_idx+1)
-            sheet[f'{column}{row_idx+1}'] = inverted[row_idx][column_idx]
+            cell = sheet[f'{column}{row_idx+1}']
+            cell.value, cell.number_format = inverted[row_idx][column_idx]
 
     if not outfile:
         logger.warning('will overwrite existing file')
