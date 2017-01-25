@@ -17,25 +17,9 @@ def main(filename, outfile=None):
     sheet: openpyxl.worksheet.worksheet.Worksheet = wb.active
     matrix = [[None for i in range(sheet.max_column)] for j in range(
         sheet.max_row)]
-    inverted = [[None for i in range(sheet.max_column)] for j in range(
-        sheet.max_row)]
+    inverted = [[None for i in range(sheet.max_row)] for j in range(
+        sheet.max_column)]
 
-    #
-    # # matrix = [[None]*sheet.max_column]*sheet.max_row
-    # matrix = []
-    # for row in range(sheet.max_row):
-    #     new_row = []
-    #     for column in range(sheet.max_column):
-    #         new_row.append(None)
-    #     matrix.append(new_row)
-    #
-    # matrix = []
-    # for row in range(sheet.max_row):
-    #     matrix.append([None for i in range(sheet.max_column)])
-    #
-    # matrix = [[None] for row in range(sheet.max_row) for column in
-    #           range(sheet.max_column)]
-    # inverted = [[None]*sheet.max_row]*sheet.max_column
     for column_idx in range(1, sheet.max_column+1):
         column = get_column_letter(column_idx)
         for row in range(1, sheet.max_row+1):
