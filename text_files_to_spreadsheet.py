@@ -17,7 +17,7 @@ logger = logging.getLogger('automate_boring.text_files_to_spreadsheet')
 def main(dirname, outfile):
     file_lines = []
     for fn in os.listdir(dirname):
-        with open(fn) as f:
+        with open(os.path.join(dirname, fn)) as f:
             file_lines.append([line.strip() for line in f.readlines()])
 
     wb = openpyxl.Workbook()

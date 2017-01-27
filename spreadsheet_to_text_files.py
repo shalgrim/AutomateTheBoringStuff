@@ -23,10 +23,10 @@ def strip_blank_lines(lines: List[str]) -> List[str]:
     sliced off
     """
     for i in range(len(lines)-1, -1, -1):
-        if lines[i].strip():
-            break
+        if lines[i] and lines[i].strip():
+            return lines[:i+1]
 
-    return lines[:i+1]
+    return []
 
 
 def main(filename, outdir):
@@ -39,11 +39,11 @@ def main(filename, outdir):
         lines = []
         for row_idx in range(sheet.max_row):
             row = row_idx + 1
-            lines.append(sheet[f'{col}{row}']).value
+            lines.append(sheet[f'{col}{row}'].value)
 
         lines = strip_blank_lines(lines)
         lines = [f'{line}\n' for line in lines]
-        with open(os.path.join(outdir, f'{col}.txt')) as f:
+        with open(os.path.join(outdir, f'{col}.txt'), 'w') as f:
             f.writelines(lines)
 
 

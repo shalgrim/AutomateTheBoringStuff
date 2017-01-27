@@ -6,7 +6,7 @@ class TestStrip_blank_lines(TestCase):
     def test_strip_blank_lines_none(self):
         """no blank lines at the end of the list"""
         orig_list = ['a', 'b']
-        self.assertEqual(strip_blank_lines(orig_list), [])
+        self.assertEqual(strip_blank_lines(orig_list), orig_list)
 
     def test_strip_blank_lines_all(self):
         """all blank lines"""
@@ -17,9 +17,9 @@ class TestStrip_blank_lines(TestCase):
     def test_strip_blank_lines_one(self):
         """one blank line"""
         inlist = ['not a blank line', '']
-        self.assertEqual(strip_blank_lines(inlist), inlist[:1])
+        self.assertEqual(strip_blank_lines(inlist), inlist[:-1])
 
     def test_strip_blank_lines_two(self):
         """two blank lines"""
         inlist = ['not a blank line', '', '\t']
-        self.assertEqual(strip_blank_lines(inlist), inlist[:2])
+        self.assertEqual(strip_blank_lines(inlist), inlist[:-2])
