@@ -9,18 +9,42 @@ import os
 from openpyxl.utils import get_column_letter
 from srhpytools_srh.options.parsers import GenArgParser
 from srhpytools_srh.util.mylogging import config_root_file_logger
+from typing import List
 
 logger = logging.getLogger('automate_boring.spreadsheet_to_text_files')
+
+
+def strip_blank_lines(lines: List[str]) -> List[str]:
+    """
+    removes from lines consecutive elements at end that are only whitespace
+    or empty
+    :param lines: list of strings
+    :return: copy of list where elements at end that are blank or empty are
+    sliced off
+    """
+    for i in range(len(lines)-1, -1, -1):
+        if lines[i].strip():
+            break
+
+    return lines[:i+1]
 
 
 def main(filename, outdir):
     wb = openpyxl.load_workbook(filename)
     sheet = wb.active
-    # the (not much of a) trick here will be to not write out a ton of blank
-    #  lines at the end of shorter files. it should be fairly
-    # straightforward to remove last several blanks from each list of lines
-    # i creates
-    raise NotImplementedError
+    os.makedirs(outdir, exist_ok=True)
+
+    for col_idx in range(sheet.max_column):
+        col = get_column_letter(col_idx+1)
+        lines = []
+        for row_idx in range(sheet.max_row):
+            row = row_idx + 1
+            lines.append(sheet[f'{col}{row}']).value
+
+        lines = strip_blank_lines(lines)
+        lines = [f'{line}\n' for line in lines]
+        with open(os.path.join(outdir, f'{col}.txt')) as f:
+            f.writelines(lines)
 
 
 if __name__ == '__main__':
