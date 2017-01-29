@@ -18,7 +18,7 @@ def main(dirname, outfile):
     file_lines = []
     for fn in os.listdir(dirname):
         with open(os.path.join(dirname, fn)) as f:
-            file_lines.append([line.strip() for line in f.readlines()])
+            file_lines.append([line.rstrip() for line in f.readlines()])
 
     wb = openpyxl.Workbook()
     sheet = wb.active

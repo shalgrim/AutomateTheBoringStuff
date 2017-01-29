@@ -42,7 +42,7 @@ def main(filename, outdir):
             lines.append(sheet[f'{col}{row}'].value)
 
         lines = strip_blank_lines(lines)
-        lines = [f'{line}\n' for line in lines]
+        lines = [f'{line}\n' if line is not None else '\n' for line in lines]
         with open(os.path.join(outdir, f'{col}.txt'), 'w') as f:
             f.writelines(lines)
 
